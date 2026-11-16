@@ -18,8 +18,8 @@ enum KeepAlivePolicy {
 
     /// The hotspot is watched every 5 seconds on screen, where starting at once shows. In the
     /// background a device that joins waits a little longer, and Tether wakes a third as often.
-    static func watchInterval(sceneActive: Bool) -> (every: Duration, tolerance: Duration) {
-        sceneActive ? (.seconds(5), .seconds(1)) : (.seconds(15), .seconds(5))
+    static func watchInterval(sceneActive: Bool) -> (every: TimeInterval, tolerance: TimeInterval) {
+        sceneActive ? (5, 1) : (15, 5)
     }
 
     /// What the audio system tells `KeepAlive` that can leave the sound silent.
