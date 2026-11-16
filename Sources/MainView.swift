@@ -6,10 +6,10 @@ struct MainView: View {
 
     /// A device's name and state side by side. At the accessibility text sizes they'd break words
     /// ("Connect-ed"), so the state goes under the name.
-    private var deviceRow: AnyLayout {
+    private var deviceRow: CompatLayout {
         textSize.isAccessibilitySize
-            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
-            : AnyLayout(HStackLayout())
+            ? CompatLayout(CompatVStackLayout(alignment: .leading, spacing: 4))
+            : CompatLayout(CompatHStackLayout())
     }
 
     @State private var showSettings = false
@@ -18,13 +18,13 @@ struct MainView: View {
     @ScaledMetric(relativeTo: .title3) private var gearSize: CGFloat = 44
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
                 // The big title and the gear, outside any card, like the system's own large titles.
                 Section {
                     HStack {
                         Text("Tether")
-                            .font(.system(.largeTitle, design: .rounded, weight: .heavy))
+                            .font(.system(size: 34, weight: .heavy, design: .rounded))
                             .accessibilityAddTraits(.isHeader)
                         Spacer()
                         Button { showSettings = true } label: {
@@ -79,7 +79,7 @@ struct MainView: View {
                 if !model.wireGuardPeers.isEmpty {
                     Section("Devices") {
                         ForEach(model.wireGuardPeers) { peer in
-                            NavigationLink { DeviceView(model: model, peer: peer) } label: {
+                            NavigationLink(destination: DeviceView(model: model, peer: peer)) {
                                 // A plain row: LabeledContent with a Label on its right grows several
                                 // rows tall inside a NavigationLink on iOS 27.
                                 VStack(alignment: .leading, spacing: 4) {
@@ -105,7 +105,7 @@ struct MainView: View {
             // The title above draws it big, so the bar stays hidden. It's still set, because the
             // screens pushed from here use it for their back button.
             .navigationTitle("Tether")
-            .toolbar(.hidden, for: .navigationBar)
+            .navigationBarHidden(true)
             .sheet(isPresented: $showSettings) { SettingsView(model: model) }
             .sheet(isPresented: $addingDevice) { AddDeviceSheet(model: model) }
             // Only its Continue closes it, see `LocalNetworkIntro`.
@@ -155,10 +155,10 @@ struct SpeedRow: View {
     let up: Double
     @Environment(\.dynamicTypeSize) private var textSize
 
-    private var layout: AnyLayout {
+    private var layout: CompatLayout {
         textSize.isAccessibilitySize
-            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
-            : AnyLayout(HStackLayout(spacing: 16))
+            ? CompatLayout(CompatVStackLayout(alignment: .leading, spacing: 4))
+            : CompatLayout(CompatHStackLayout(spacing: 16))
     }
 
     var body: some View {
@@ -232,10 +232,10 @@ struct StatusCard: View {
 
     /// The orb sits left of the text. At the accessibility text sizes a row would squeeze the text
     /// into a narrow column, so the orb goes above it.
-    private var layout: AnyLayout {
+    private var layout: CompatLayout {
         textSize.isAccessibilitySize
-            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 12))
-            : AnyLayout(HStackLayout(alignment: .center, spacing: 18))
+            ? CompatLayout(CompatVStackLayout(alignment: .leading, spacing: 12))
+            : CompatLayout(CompatHStackLayout(alignment: .center, spacing: 18))
     }
 
     var body: some View {
@@ -244,7 +244,7 @@ struct StatusCard: View {
                 StatusOrb(look: look)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
-                        .font(.system(.title, design: .rounded, weight: .bold))
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
                         .accessibilityIdentifier("status.title")
                     if blocked {
                         Text("Local Network is off for Tether")
