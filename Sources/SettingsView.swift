@@ -31,7 +31,7 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
                 sharing
                 newDevices
@@ -61,7 +61,7 @@ struct SettingsView: View {
 
     private var help: some View {
         Section {
-            ShareLink(item: LogFile(), preview: SharePreview("Tether log")) {
+            LegacyShareButton(item: { try? Model.writeLog() }) {
                 Label("Share the log", systemImage: "square.and.arrow.up")
             }
             .accessibilityIdentifier("settings.log")
@@ -77,15 +77,15 @@ struct SettingsView: View {
 
     @ViewBuilder private var about: some View {
         Section {
-            LabeledContent("Version", value: Model.version)
+            HStack { Text("Version"); Spacer(); Text(Model.version) }
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("settings.version")
             if let expires = model.expires {
-                LabeledContent("Stops opening", value: expires.formatted(date: .abbreviated, time: .omitted))
+                HStack { Text("Stops opening"); Spacer(); Text(expires.formatted(date: .abbreviated, time: .omitted)) }
                     .accessibilityElement(children: .combine)
                     .accessibilityIdentifier("settings.expires")
             }
-            LabeledContent("License", value: "MIT")
+            HStack { Text("License"); Spacer(); Text("MIT") }
         } header: {
             Text("About")
         } footer: {
@@ -109,7 +109,7 @@ struct SettingsView: View {
             .pickerStyle(.menu)
             .accessibilityIdentifier("sharing.resetDay")
             // The screens show the new dates as soon as Settings closes (#187).
-            .onChange(of: resetDay) { model.resetDayChanged() }
+            .onChange(of: resetDay) { _ in model.resetDayChanged() }
         } header: {
             Text("Sharing")
         } footer: {
@@ -162,7 +162,7 @@ struct SettingsView: View {
         // A device whose config names Tether asks the new choice from its next lookup. What's typed is
         // passed on when it's submitted or Settings closes, not each keystroke: every start of an ID
         // looks like one, and the devices' lookups would go to each in turn.
-        .onChange(of: dns) { model.dnsChanged() }
+        .onChange(of: dns) { _ in model.dnsChanged() }
         .onDisappear { model.dnsChanged() }
     }
 
@@ -182,7 +182,7 @@ struct SettingsView: View {
                 .accessibilityIdentifier("localNetworks.footer")
         }
         // Turning it off closes what the devices have open there at once (#230).
-        .onChange(of: localNetworksAllowed) { model.localNetworksChanged() }
+        .onChange(of: localNetworksAllowed) { _ in model.localNetworksChanged() }
     }
 
     @ViewBuilder private var notices: some View {
@@ -205,7 +205,7 @@ struct SettingsView: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("notices.denied")
                 Button("Open iOS Settings") {
-                    UIApplication.shared.open(URL(string: UIApplication.openNotificationSettingsURLString)!)
+                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                 }
                 .accessibilityIdentifier("notices.settings")
             }
@@ -220,14 +220,6 @@ struct SettingsView: View {
             Text("Only while Tether is in the background. While it's open, you see it on screen.")
                 .accessibilityIdentifier("notices.footer")
         }
-    }
-}
-
-/// The log as a file to share, see `DebugLog`. It's written when the share sheet asks for it, so it
-/// has the lines up to then.
-private struct LogFile: Transferable {
-    static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(exportedContentType: .plainText) { _ in SentTransferredFile(try Model.writeLog()) }
     }
 }
 
