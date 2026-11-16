@@ -101,11 +101,10 @@ struct AddDeviceSheet: View {
             }
             .background(Color(.systemGroupedBackground))
             // Lowering the keyboard needs a way other than its Done, which saves and closes.
-            .scrollDismissesKeyboard(.immediately)
             // iOS scrolls only the text of a focused field above the keyboard, not the box around
             // it, which then ran under Done. The box's padding and the space above Done, as
             // room under the scrolling content (#173).
-            .safeAreaPadding(.bottom, Self.nameBoxRoom)
+            .padding(.bottom, Self.nameBoxRoom)
             .safeAreaInset(edge: .bottom) {
                 if naming.device != nil {
                     Button(action: finish) {
@@ -145,7 +144,7 @@ struct AddDeviceSheet: View {
                 UIApplication.shared.isIdleTimerDisabled = self.progress.keepsScreenAwake
             }
             .onChangeCompat(of: progress) { old, new in
-                if let text = new.announcement(after: old) { AccessibilityNotification.Announcement(text).post() }
+                if let text = new.announcement(after: old) { UIAccessibility.post(notification: .announcement, argument: text) }
             }
             .onChangeCompat(of: progress.keepsScreenAwake) { _, awake in UIApplication.shared.isIdleTimerDisabled = awake }
             // The first time it connects, the keyboard comes up with the name it got, selected, so
@@ -234,7 +233,7 @@ struct AddDeviceSheet: View {
         guard let change = naming.change(in: model.wireGuardPeers) else { return true }
         model.renameWireGuardDevice(change.id, to: change.name)
         guard let problem = model.wireGuardDeviceProblem, problem.device == change.id else { return true }
-        AccessibilityNotification.Announcement(problem.text).post()
+        UIAccessibility.post(notification: .announcement, argument: problem.text)
         return false
     }
 
@@ -426,10 +425,10 @@ struct AddDeviceSheet: View {
                 UIPasteboard.general.string = address
                 // Without this nothing says the copy worked (#175).
                 copiedID = copyID
-                AccessibilityNotification.Announcement("Copied").post()
+                UIAccessibility.post(notification: .announcement, argument: "Copied")
                 copyReset?.cancel()
                 copyReset = Task {
-                    guard (try? await Task.sleep(for: .seconds(2))) != nil else { return }
+                    guard (try? await Task.sleep(nanoseconds: 2_000_000_000)) != nil else { return }
                     copiedID = nil
                 }
             } label: {
