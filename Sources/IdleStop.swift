@@ -14,7 +14,7 @@ struct IdleStop {
         case thirtyMinutes = 1800
         case oneHour = 3600
 
-        static let `default` = After.never
+        static let `default` = After.threeMinutes
         /// Where it's saved in UserDefaults, as seconds, 0 for never.
         static let key = "sharing.idleStopAfter"
 
