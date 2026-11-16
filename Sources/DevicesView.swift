@@ -42,7 +42,7 @@ struct AddDeviceSection: View {
         // The icon and the title side by side: a Label in a list row can drop its icon.
         let button = Button(action: add) {
             HStack(spacing: 8) {
-                Image(systemName: "plus").fontWeight(.bold).accessibilityHidden(true)
+                Image(systemName: "plus").font(.body.weight(.bold)).accessibilityHidden(true)
                 Text(title)
             }
             .font(.headline)
@@ -142,7 +142,7 @@ struct DeviceView: View {
                     }
                     // Only while it isn't connected (#73): connected says it all, and a paused one says why.
                     if status == .notConnected {
-                        LabeledContent("Last connected", value: model.lastConnected(of: peer.id))
+                        HStack { Text("Last connected"); Spacer(); Text(model.lastConnected(of: peer.id)) }
                             .accessibilityElement(children: .combine)
                             .accessibilityIdentifier("device.lastConnected")
                     }
@@ -166,13 +166,12 @@ struct DeviceView: View {
                 }
             }
             // Remove is at the bottom, so a removal that fails says so up there, out of sight with large text.
-            .onChange(of: problem) { _, problem in
+            .onChange(of: problem) { problem in
                 if problem != nil { withAnimation { proxy.scrollTo("problem", anchor: .top) } }
             }
         }
-        .navigationTitle(Binding(get: { current.name }, set: { model.renameWireGuardDevice(peer.id, to: $0) }))
+        .navigationTitle(current.name)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarRole(.editor)
         .alert("Data limit", isPresented: $typingLimit) {
             TextField("GB", text: $typedLimit)
                 .keyboardType(.decimalPad)
@@ -247,7 +246,7 @@ extension DeviceView {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("device.thisMonth")
             }
-            LabeledContent(model.lastPeriodLabel, value: Format.bytes(usage.lastMonth.total))
+            HStack { Text(model.lastPeriodLabel); Spacer(); Text(Format.bytes(usage.lastMonth.total)) }
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("device.lastMonth")
             Picker("Limit", selection: Binding(get: { LimitPick.preset(current.limit) }, set: { pick in
