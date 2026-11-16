@@ -19,7 +19,8 @@ struct IdleStop {
         static let key = "sharing.idleStopAfter"
 
         static func saved(in defaults: UserDefaults) -> After {
-            After(rawValue: defaults.integer(forKey: key)) ?? .default
+            guard defaults.object(forKey: key) != nil else { return .default }
+            return After(rawValue: defaults.integer(forKey: key)) ?? .default
         }
 
         var seconds: TimeInterval? { self == .never ? nil : TimeInterval(rawValue) }
