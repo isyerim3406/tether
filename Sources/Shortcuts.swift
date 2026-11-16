@@ -5,6 +5,7 @@ import AppIntents
 // for Personal Hotspot turning on. So a shortcut turns the hotspot on with Shortcuts' own Set Personal Hotspot
 // action, then runs Start Tether, which wakes Tether in the background without opening it.
 
+@available(iOS 16.0, *)
 struct StartTetherIntent: AppIntent {
     static var title: LocalizedStringResource = "Start Tether"
     static var description = IntentDescription(
@@ -19,6 +20,7 @@ struct StartTetherIntent: AppIntent {
     }
 }
 
+@available(iOS 16.0, *)
 struct TetherStatusIntent: AppIntent {
     static var title: LocalizedStringResource = "Is Tether Sharing?"
     static var description = IntentDescription(
@@ -34,6 +36,7 @@ struct TetherStatusIntent: AppIntent {
 }
 
 /// Ready in Shortcuts, Siri and Spotlight as soon as Tether is installed, with nothing to set up.
+@available(iOS 16.0, *)
 struct TetherShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: StartTetherIntent(),
