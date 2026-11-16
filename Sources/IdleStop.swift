@@ -9,6 +9,7 @@ struct IdleStop {
     /// The setting in Settings > Sharing.
     enum After: Int, CaseIterable {
         case never = 0
+        case threeMinutes = 180
         case tenMinutes = 600
         case thirtyMinutes = 1800
         case oneHour = 3600
@@ -27,6 +28,7 @@ struct IdleStop {
         var label: String {
             switch self {
             case .never: "Never"
+            case .threeMinutes: "After 3 min"
             case .tenMinutes: "After 10 min"
             case .thirtyMinutes: "After 30 min"
             case .oneHour: "After 1 hour"
@@ -37,6 +39,7 @@ struct IdleStop {
         var spelledOut: String {
             switch self {
             case .never: ""
+            case .threeMinutes: "3 minutes"
             case .tenMinutes: "10 minutes"
             case .thirtyMinutes: "30 minutes"
             case .oneHour: "1 hour"
