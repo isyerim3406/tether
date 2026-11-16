@@ -20,7 +20,7 @@ enum DataLimit {
     /// most one separator (`Double` alone takes "0x10" and "1e3"), under `minBytes`, or over `maxGB`.
     static func bytes(typedGB: String) -> UInt64? {
         let text = typedGB.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: ",", with: ".")
-        guard text.wholeMatch(of: #/[0-9]+(\.[0-9]*)?|\.[0-9]+/#) != nil,
+        guard text.range(of: #"^([0-9]+(\.[0-9]*)?|\.[0-9]+)$"#, options: .regularExpression) != nil,
               let gb = Double(text), gb <= maxGB else { return nil }
         let bytes = UInt64((gb * 1_000_000_000).rounded())
         return bytes < minBytes ? nil : bytes
