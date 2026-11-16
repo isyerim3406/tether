@@ -11,7 +11,7 @@ struct LocalNetworkIntroView: View {
                 StatusOrb(look: .sharing)
                     .padding(.top, 48)
                 Text("Tether needs Local Network")
-                    .font(.system(.largeTitle, design: .rounded, weight: .heavy))
+                    .font(.system(size: 34, weight: .heavy, design: .rounded))
                     .multilineTextAlignment(.center)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityIdentifier("intro.title")
