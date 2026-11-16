@@ -25,10 +25,10 @@ if [[ -f $shallow ]] && grep -qxFf "$shallow" <(git rev-list HEAD); then
 fi
 
 xcodegen generate --quiet
-xcodebuild archive -project Tether.xcodeproj -scheme Tether -configuration Release \
+xcodebuild -quiet archive -project Tether.xcodeproj -scheme Tether -configuration Release \
     -destination generic/platform=iOS -archivePath "$work/Tether.xcarchive" -derivedDataPath "$work/dd" \
     CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= MARKETING_VERSION="$version" \
-    | tail -3
+
 
 app=$work/Tether.xcarchive/Products/Applications/Tether.app
 [[ $(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$app/Info.plist") == "$version" ]] \
