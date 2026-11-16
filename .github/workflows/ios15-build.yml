@@ -1,0 +1,27 @@
+name: iOS 15.6 compatibility IPA
+on:
+  push:
+    branches: [ios15-compat]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/build-tools
+      - name: Build unsigned IPA
+        run: |
+          set -o pipefail
+          scripts/build-ipa.sh 0.15.6 "$RUNNER_TEMP/ios15"
+          cp "$RUNNER_TEMP/ios15/Tether.ipa" "$RUNNER_TEMP/Tether-iOS15.6-unsigned.ipa"
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tether-iOS15.6-unsigned
+          path: ${{ runner.temp }}/Tether-iOS15.6-unsigned.ipa
+          if-no-files-found: error
