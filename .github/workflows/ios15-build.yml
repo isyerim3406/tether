@@ -3,6 +3,9 @@ on:
   push:
     branches: [ios15-compat]
   workflow_dispatch:
+concurrency:
+  group: ios15-compat
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
