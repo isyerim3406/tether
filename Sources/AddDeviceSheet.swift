@@ -42,7 +42,7 @@ struct AddDeviceSheet: View {
     var body: some View {
         let progress = progress
         let current = Self.current(progress)
-        NavigationStack {
+        NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
                     // Above the steps: a device scanned first would only learn after that it can't work.
@@ -136,7 +136,7 @@ struct AddDeviceSheet: View {
                     }
                 }
             }
-            .onChange(of: model.wireGuardReady?.id) { _, new in
+            .onChangeCompat(of: model.wireGuardReady?.id) { _, new in
                 if self.progress.device == nil { readyID = new }
             }
             // The demos that open on the sheet open the window the same way.
@@ -144,13 +144,13 @@ struct AddDeviceSheet: View {
                 model.openAddWindow()
                 UIApplication.shared.isIdleTimerDisabled = self.progress.keepsScreenAwake
             }
-            .onChange(of: progress) { old, new in
+            .onChangeCompat(of: progress) { old, new in
                 if let text = new.announcement(after: old) { AccessibilityNotification.Announcement(text).post() }
             }
-            .onChange(of: progress.keepsScreenAwake) { _, awake in UIApplication.shared.isIdleTimerDisabled = awake }
+            .onChangeCompat(of: progress.keepsScreenAwake) { _, awake in UIApplication.shared.isIdleTimerDisabled = awake }
             // The first time it connects, the keyboard comes up with the name it got, selected, so
             // typing replaces it. Its tunnel dropping after that leaves the step as it is.
-            .onChange(of: progress, initial: true) { _, progress in
+            .onChangeCompat(of: progress, initial: true) { _, progress in
                 guard naming.device == nil else { return }
                 naming.follow(progress)
                 if naming.device != nil {
@@ -160,7 +160,7 @@ struct AddDeviceSheet: View {
             }
             .modifier(SelectsAllOnEdit(pending: $selectsName))
             // Claimed: its file now holds a key that works.
-            .onChange(of: progress.device != nil) { _, claimed in if claimed { ReadyCode.forget() } }
+            .onChangeCompat(of: progress.device != nil) { _, claimed in if claimed { ReadyCode.forget() } }
             .onDisappear {
                 // Closed another way than Done keeps what was typed too.
                 _ = saveName()
@@ -183,7 +183,7 @@ struct AddDeviceSheet: View {
                 Text("Connected")
                     .accessibilityIdentifier("add.result")
             }
-            .font(.system(.title, design: .rounded, weight: .heavy))
+            .font(.system(size: 28, weight: .heavy, design: .rounded))
             Text("It uses this iPhone's data now.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -368,7 +368,7 @@ struct AddDeviceSheet: View {
                 Rectangle().fill(Color(.separator)).frame(height: 1)
             }
             .accessibilityHidden(true)
-            ShareLink(item: file) {
+            LegacyShareButton(item: { file }) {
                 Group {
                     // At accessibility sizes the icon goes above the text: on one line the text
                     // breaks inside a word (#176).
@@ -405,8 +405,8 @@ struct AddDeviceSheet: View {
     /// One address of the page, with a button to copy it.
     private func addressRow(_ address: String, id: String, copyID: String) -> some View {
         // At accessibility sizes the copy button goes under the address, which then has the whole width.
-        let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
-                                                         : AnyLayout(HStackLayout(spacing: 10))
+        let layout = dynamicTypeSize.isAccessibilitySize ? CompatLayout(CompatVStackLayout(alignment: .leading, spacing: 6))
+                                                         : CompatLayout(CompatHStackLayout(spacing: 10))
         return layout {
             // An IPv6 address is up to 47 characters with http:// and its brackets, with no space to
             // break a line at. A zero-width space after each colon lets it wrap, to as many lines as it
