@@ -191,7 +191,9 @@ final class Model: ObservableObject {
                 self?.notify()
                 // The slack lets iOS wake the app for this together with other timers.
                 let interval = KeepAlivePolicy.watchInterval(sceneActive: self?.session.sceneActive ?? false)
-                try? await Task.sleep(for: interval.every, tolerance: interval.tolerance)
+                let parts = interval.every.components
+                let nanos = UInt64(max(0, Double(parts.seconds) * 1_000_000_000 + Double(parts.attoseconds) / 1_000_000_000))
+                try? await Task.sleep(nanoseconds: nanos)
             }
         }
         if session.sceneActive { startSampler() }
@@ -226,7 +228,7 @@ final class Model: ObservableObject {
         sampler = Task { [weak self] in
             while !Task.isCancelled {
                 self?.sampleTraffic()
-                try? await Task.sleep(for: .seconds(1))
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
             }
         }
     }
